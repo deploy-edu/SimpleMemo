@@ -1,6 +1,6 @@
 import { Session } from "@supabase/supabase-js";
-import { FC, useEffect } from "react";
-import { View } from "react-native";
+import { FC, useEffect, useState } from "react";
+import { Button, SafeAreaView, TextInput, View } from "react-native";
 import { supabase } from "../lib/supabase";
 
 type Props = {
@@ -8,13 +8,17 @@ type Props = {
 };
 
 const MemoList: FC<Props> = ({ session }) => {
+  const [data, setData] = useState<{ title: string; content: string }[]>([]);
+
   useEffect(() => {
     async function fetchMemos() {
       try {
-        const { data, error, status } = await supabase
-          .from("Memo")
-          .select(`title, content`);
-        console.log(data);
+        const {
+          data: fetchedData,
+          error,
+          status,
+        } = await supabase.from("Memo").select(`title, content`);
+        fetchedData && setData(fetchedData);
       } catch (e) {
         console.error(e);
       }
@@ -22,7 +26,35 @@ const MemoList: FC<Props> = ({ session }) => {
     fetchMemos();
   }, []);
 
-  return <View />;
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  const onSave = async () => {
+    try {
+      const { data, error, status } = await supabase
+        .from("Memo")
+        .insert({ title, content });
+
+      setTitle("");
+      setContent("");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  return (
+    <SafeAreaView>
+      <View style={{ padding: 20 }}>
+        <TextInput placeholder="Title" value={title} onChangeText={setTitle} />
+        <TextInput
+          placeholder="Content"
+          value={content}
+          onChangeText={setContent}
+        />
+        <Button title="저장" onPress={onSave} />
+      </View>
+    </SafeAreaView>
+  );
 };
 
 export default MemoList;
