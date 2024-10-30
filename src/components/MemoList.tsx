@@ -17,19 +17,23 @@ type Props = {
 const MemoList: FC<Props> = ({ session }) => {
   const [data, setData] = useState<{ title: string; content: string }[]>([]);
 
-  useEffect(() => {
-    async function fetchMemos() {
-      try {
-        const {
-          data: fetchedData,
-          error,
-          status,
-        } = await supabase.from("Memo").select(`title, content`);
-        fetchedData && setData(fetchedData);
-      } catch (e) {
-        console.error(e);
-      }
+  async function fetchMemos() {
+    try {
+      const {
+        data: fetchedData,
+        error,
+        status,
+      } = await supabase
+        .from("Memo")
+        .select(`title, content`)
+        .order("id", { ascending: false });
+      fetchedData && setData(fetchedData);
+    } catch (e) {
+      console.error(e);
     }
+  }
+
+  useEffect(() => {
     fetchMemos();
   }, []);
 
@@ -44,6 +48,7 @@ const MemoList: FC<Props> = ({ session }) => {
 
       setTitle("");
       setContent("");
+      await fetchMemos();
     } catch (e) {
       console.error(e);
     }
