@@ -1,6 +1,13 @@
 import { Session } from "@supabase/supabase-js";
 import { FC, useEffect, useState } from "react";
-import { Button, SafeAreaView, TextInput, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  SafeAreaView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { supabase } from "../lib/supabase";
 
 type Props = {
@@ -53,6 +60,20 @@ const MemoList: FC<Props> = ({ session }) => {
         />
         <Button title="저장" onPress={onSave} />
       </View>
+      <FlatList
+        data={data}
+        renderItem={({ item }) => (
+          <View style={{ padding: 20 }}>
+            <View style={{ marginBottom: 10 }}>
+              <Text>{item.title}</Text>
+            </View>
+            <View>
+              <Text>{item.content}</Text>
+            </View>
+          </View>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
     </SafeAreaView>
   );
 };
